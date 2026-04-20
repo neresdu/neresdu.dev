@@ -13,7 +13,6 @@ export const en = {
     description: 'Software engineer with 4+ years building backend, cloud and platform systems. Experience spans medical embedded (Hilab), automotive/IoT (Bosch) and now insurance platform engineering (Guidewire).',
     cta_projects: 'View projects',
     cta_github: 'GitHub',
-    status_available: 'Open to opportunities',
     location: 'Curitiba, BR',
   },
   about: {
