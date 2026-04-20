@@ -5,13 +5,14 @@ const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 ---
 
-<section id="about" class="container-site py-16 md:py-24">
+<section id="about" class="container-site py-16 md:py-24 reveal">
   <div class="section-label mb-2">01 / {t('about.section')}</div>
 
   <!-- Title + photo inline (variation 2) -->
   <div class="flex items-center gap-4 md:gap-5 mb-8">
+    <!-- Photo placeholder: replace /public/avatar.jpg with your real photo -->
     <div
-        class="flex-shrink-0 w-14 h-14 md:w-20 md:h-20 rounded-full overflow-hidden"
+      class="flex-shrink-0 w-14 h-14 md:w-20 md:h-20 rounded-full overflow-hidden"
         style="border: 0.5px solid var(--border-strong);"
       >
         <img

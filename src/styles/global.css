@@ -38,6 +38,7 @@
 
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: 4.5rem; /* offset for sticky 64px header + breathing room */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -95,5 +96,98 @@
   .container-site {
     @apply mx-auto px-6 md:px-8;
     max-width: 1100px;
+  }
+}
+
+/* ========================================================================
+   ANIMATIONS
+   ======================================================================== */
+
+/* Scroll-triggered reveal: elements start invisible, slightly offset.
+   The .is-visible class is added by IntersectionObserver in BaseLayout. */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered delays — apply .reveal-delay-N to reveal children with a stagger */
+.reveal-delay-1 { transition-delay: 0.08s; }
+.reveal-delay-2 { transition-delay: 0.16s; }
+.reveal-delay-3 { transition-delay: 0.24s; }
+.reveal-delay-4 { transition-delay: 0.32s; }
+.reveal-delay-5 { transition-delay: 0.40s; }
+
+/* Hover lift for cards (projects, certifications, stack) */
+.hover-lift {
+  transition:
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  will-change: transform;
+}
+.hover-lift:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-strong) !important;
+}
+
+/* Pulse animation for the current role dot in the timeline */
+@keyframes dot-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-light) 60%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent-light) 0%, transparent);
+  }
+}
+
+.timeline-current-dot {
+  animation: dot-pulse 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Staggered fade for hero elements on initial load */
+@keyframes slide-up-fade {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-stagger > * {
+  opacity: 0;
+  animation: slide-up-fade 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.hero-stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.hero-stagger > *:nth-child(2) { animation-delay: 0.15s; }
+.hero-stagger > *:nth-child(3) { animation-delay: 0.30s; }
+.hero-stagger > *:nth-child(4) { animation-delay: 0.45s; }
+
+/* Respect users who prefer reduced motion — disable all animations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal,
+  .hero-stagger > * {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
