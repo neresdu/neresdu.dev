@@ -1,0 +1,105 @@
+---
+/**
+ * TechIcon — renders a tech logo with a hybrid behavior:
+ *   - Default state: monochrome (using text-currentColor style)
+ *   - Hover state: colored (loaded from Simple Icons with default color)
+ *
+ * Two SVG images are overlaid — monochrome stays visible until hover,
+ * where it fades out and the colored version fades in.
+ *
+ * For techs without a Simple Icons entry (customIcon: true), renders a
+ * text-badge fallback showing the first 2–3 characters.
+ */
+
+interface Props {
+  name: string;
+  slug: string;
+  customIcon?: boolean;
+  size?: number;
+}
+
+const { name, slug, customIcon = false, size = 20 } = Astro.props;
+
+// Simple Icons CDN URLs:
+// - Plain /slug = monochrome black (we filter it to currentColor)
+// - /slug/_/color = with specific color (but we want default brand color)
+// - Actually the plain URL + color suffix works: /slug/color gives a specific color
+//   Leaving color off gives default brand color
+const monoUrl = `https://cdn.simpleicons.org/${slug}`;
+const colorUrl = `https://cdn.simpleicons.org/${slug}`;
+
+// The 2–3 char badge shown for fallback icons or when image fails
+const fallbackChars = name.replace(/[^a-zA-Z0-9+#.]/g, '').slice(0, 3).toUpperCase();
+---
+
+{customIcon ? (
+  <div
+    class="tech-icon-fallback flex items-center justify-center rounded font-mono font-medium uppercase shrink-0"
+    style={`width: ${size}px; height: ${size}px; background: var(--bg-tertiary); color: var(--text-secondary); border: 0.5px solid var(--border); font-size: ${Math.max(7, size * 0.45)}px;`}
+    aria-label={name}
+    title={name}
+  >
+    {fallbackChars}
+  </div>
+) : (
+  <span
+    class="tech-icon-wrapper relative inline-block shrink-0"
+    style={`width: ${size}px; height: ${size}px;`}
+  >
+    <!-- Monochrome layer (default) -->
+    <img
+      src={monoUrl}
+      alt={`${name} logo`}
+      width={size}
+      height={size}
+      loading="lazy"
+      class="tech-icon-mono absolute inset-0 transition-opacity duration-200"
+      data-fallback={fallbackChars}
+    />
+    <!-- Colored layer (shown on hover) -->
+    <img
+      src={colorUrl}
+      alt=""
+      aria-hidden="true"
+      width={size}
+      height={size}
+      loading="lazy"
+      class="tech-icon-color absolute inset-0 opacity-0 transition-opacity duration-200"
+    />
+  </span>
+)}
+
+<style>
+  /* Monochrome layer: convert brand color to currentColor-like behavior */
+  :global(html:not(.dark)) .tech-icon-mono {
+    filter: brightness(0) saturate(100%);
+    opacity: 0.7;
+  }
+  :global(html.dark) .tech-icon-mono {
+    filter: brightness(0) invert(1);
+    opacity: 0.75;
+  }
+
+  /* On parent hover — fade mono out, color in */
+  :global(li:hover) .tech-icon-mono,
+  :global(.tech-icon-wrapper:hover) .tech-icon-mono {
+    opacity: 0;
+  }
+  :global(li:hover) .tech-icon-color,
+  :global(.tech-icon-wrapper:hover) .tech-icon-color {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  // Graceful fallback: if an icon fails to load, replace with text badge
+  document.querySelectorAll<HTMLImageElement>('.tech-icon-mono').forEach((img) => {
+    img.addEventListener('error', () => {
+      const wrapper = img.closest('.tech-icon-wrapper');
+      if (!wrapper) return;
+      const fallback = img.dataset.fallback || '?';
+      const size = wrapper.getBoundingClientRect().width;
+      wrapper.outerHTML = `<div class="flex items-center justify-center rounded font-mono font-medium uppercase shrink-0" style="width: ${size}px; height: ${size}px; background: var(--bg-tertiary); color: var(--text-secondary); border: 0.5px solid var(--border); font-size: ${Math.max(7, size * 0.45)}px;" title="${img.alt}">${fallback}</div>`;
+    });
+  });
+</script>

@@ -1,0 +1,48 @@
+---
+import { getLangFromUrl, useTranslations } from '@i18n/utils';
+import { personal } from '@/data/profile';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-24 pb-8" style="border-top: 0.5px solid var(--border);">
+  <div class="container-site pt-8">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-6 h-6 rounded flex items-center justify-center font-mono text-[10px]"
+          style="background: var(--accent); color: white;"
+        >
+          &lt;/&gt;
+        </div>
+        <span class="text-sm" style="color: var(--text-secondary);">
+          © {year} {personal.name} · {t('footer.rights')}
+        </span>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3 text-xs font-mono" style="color: var(--text-tertiary);">
+        <a
+          href={personal.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hover:text-[color:var(--accent-light)] transition-colors"
+        >
+          github ↗
+        </a>
+        <span>·</span>
+        <a
+          href={personal.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hover:text-[color:var(--accent-light)] transition-colors"
+        >
+          linkedin ↗
+        </a>
+        <span>·</span>
+        <span>{t('footer.built_with')}</span>
+      </div>
+    </div>
+  </div>
+</footer>

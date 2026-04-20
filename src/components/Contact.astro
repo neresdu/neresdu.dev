@@ -1,0 +1,252 @@
+---
+import { getLangFromUrl, useTranslations } from '@i18n/utils';
+import { personal } from '@/data/profile';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Web3Forms access key — edit this file once you sign up at https://web3forms.com
+// Set the key as an environment variable or paste directly here.
+// For now we use a placeholder; we'll replace it during deployment.
+const WEB3FORMS_KEY = import.meta.env.PUBLIC_WEB3FORMS_KEY || 'YOUR_WEB3FORMS_ACCESS_KEY';
+const keyConfigured = WEB3FORMS_KEY !== 'YOUR_WEB3FORMS_ACCESS_KEY';
+
+const labels = {
+  pt: {
+    title: 'Vamos conversar?',
+    subtitle: 'Aberto a oportunidades, projetos e boas conversas técnicas. Me envie uma mensagem:',
+    name: 'Nome',
+    email: 'Email',
+    subject: 'Assunto',
+    message: 'Mensagem',
+    subject_placeholder: 'Qual o tema?',
+    message_placeholder: 'Conte um pouco sobre o que te trouxe aqui…',
+    send: 'Enviar mensagem',
+    sending: 'Enviando…',
+    success: '✓ Mensagem enviada! Respondo em até 48h.',
+    error: 'Algo deu errado. Você pode me enviar um email direto:',
+    direct_email: 'Ou me mande um email direto:',
+    configure_warning: 'Formulário ainda não configurado. Use o email abaixo por enquanto.',
+  },
+  en: {
+    title: 'Let\'s talk?',
+    subtitle: 'Open to opportunities, projects and good technical conversations. Send me a message:',
+    name: 'Name',
+    email: 'Email',
+    subject: 'Subject',
+    message: 'Message',
+    subject_placeholder: 'What\'s it about?',
+    message_placeholder: 'Tell me a bit about what brought you here…',
+    send: 'Send message',
+    sending: 'Sending…',
+    success: '✓ Message sent! I\'ll reply within 48h.',
+    error: 'Something went wrong. You can email me directly:',
+    direct_email: 'Or email me directly:',
+    configure_warning: 'Form not configured yet. Use the email below for now.',
+  },
+};
+
+const l = labels[lang];
+---
+
+<section id="contact" class="container-site py-16 md:py-24">
+  <div class="section-label mb-2">05 / {lang === 'pt' ? 'CONTATO' : 'CONTACT'}</div>
+  <h2 class="text-2xl md:text-3xl font-medium mb-3">{l.title}</h2>
+  <p class="text-sm md:text-base mb-8 max-w-2xl" style="color: var(--text-secondary);">
+    {l.subtitle}
+  </p>
+
+  <div class="max-w-2xl">
+    {!keyConfigured && (
+      <div
+        class="mb-6 p-4 rounded-lg text-sm"
+        style="background: var(--bg-secondary); border: 0.5px solid var(--border); color: var(--text-secondary);"
+      >
+        ⚠️ {l.configure_warning}
+      </div>
+    )}
+
+    <form id="contact-form" class="space-y-4">
+      <!-- Web3Forms hidden fields -->
+      <input type="hidden" name="access_key" value={WEB3FORMS_KEY} />
+      <input type="hidden" name="subject" value={`[neresdu.dev] New contact from the site`} />
+      <input type="hidden" name="from_name" value="neresdu.dev contact form" />
+      <input type="checkbox" name="botcheck" class="hidden" style="display:none" tabindex="-1" autocomplete="off" />
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-mono mb-1.5 uppercase tracking-wider" style="color: var(--text-tertiary);">
+            {l.name}
+          </label>
+          <input
+            type="text"
+            name="name"
+            required
+            autocomplete="name"
+            class="form-input w-full"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-mono mb-1.5 uppercase tracking-wider" style="color: var(--text-tertiary);">
+            {l.email}
+          </label>
+          <input
+            type="email"
+            name="email"
+            required
+            autocomplete="email"
+            class="form-input w-full"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-mono mb-1.5 uppercase tracking-wider" style="color: var(--text-tertiary);">
+          {l.subject}
+        </label>
+        <input
+          type="text"
+          name="user_subject"
+          required
+          placeholder={l.subject_placeholder}
+          class="form-input w-full"
+        />
+      </div>
+
+      <div>
+        <label class="block text-xs font-mono mb-1.5 uppercase tracking-wider" style="color: var(--text-tertiary);">
+          {l.message}
+        </label>
+        <textarea
+          name="message"
+          required
+          rows="5"
+          placeholder={l.message_placeholder}
+          class="form-input w-full resize-y"
+        ></textarea>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+        <button
+          type="submit"
+          class="btn-primary justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={!keyConfigured}
+        >
+          <span class="submit-label">{l.send}</span>
+          <span class="sending-label hidden">{l.sending}</span>
+          <span aria-hidden="true">→</span>
+        </button>
+        <span class="text-xs font-mono" style="color: var(--text-tertiary);">
+          {l.direct_email}{' '}
+          <a
+            href={`mailto:${personal.email}`}
+            class="transition-colors hover:text-[color:var(--accent-light)]"
+            style="color: var(--text-secondary);"
+          >
+            {personal.email}
+          </a>
+        </span>
+      </div>
+
+      <!-- Status messages -->
+      <div
+        id="form-success"
+        class="hidden p-3 rounded-lg text-sm font-medium"
+        style="background: rgba(100, 160, 30, 0.1); border: 0.5px solid #639922; color: #639922;"
+      >
+        {l.success}
+      </div>
+      <div
+        id="form-error"
+        class="hidden p-3 rounded-lg text-sm"
+        style="background: rgba(226, 75, 74, 0.1); border: 0.5px solid #E24B4A; color: #E24B4A;"
+      >
+        {l.error}{' '}
+        <a
+          href={`mailto:${personal.email}`}
+          class="underline font-medium"
+        >
+          {personal.email}
+        </a>
+      </div>
+    </form>
+  </div>
+</section>
+
+<style>
+  .form-input {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 0.5px solid var(--border-strong);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .form-input:focus {
+    outline: none;
+    border-color: var(--accent-light);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-light) 15%, transparent);
+  }
+  .form-input::placeholder {
+    color: var(--text-tertiary);
+  }
+</style>
+
+<script>
+  const form = document.getElementById('contact-form') as HTMLFormElement | null;
+  const success = document.getElementById('form-success');
+  const errorEl = document.getElementById('form-error');
+  const submitLabel = form?.querySelector('.submit-label');
+  const sendingLabel = form?.querySelector('.sending-label');
+  const submitBtn = form?.querySelector<HTMLButtonElement>('button[type="submit"]');
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (!submitBtn || submitBtn.disabled) return;
+
+    // Reset states
+    success?.classList.add('hidden');
+    errorEl?.classList.add('hidden');
+
+    // UI: loading
+    submitBtn.disabled = true;
+    submitLabel?.classList.add('hidden');
+    sendingLabel?.classList.remove('hidden');
+
+    const formData = new FormData(form);
+    const object: Record<string, any> = {};
+    formData.forEach((value, key) => {
+      object[key] = value;
+    });
+
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(object),
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        success?.classList.remove('hidden');
+        form.reset();
+      } else {
+        console.error('[contact] web3forms error:', data);
+        errorEl?.classList.remove('hidden');
+      }
+    } catch (err) {
+      console.error('[contact] fetch failed:', err);
+      errorEl?.classList.remove('hidden');
+    } finally {
+      submitBtn.disabled = false;
+      submitLabel?.classList.remove('hidden');
+      sendingLabel?.classList.add('hidden');
+    }
+  });
+</script>

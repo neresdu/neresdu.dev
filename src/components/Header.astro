@@ -1,0 +1,240 @@
+---
+import { getLangFromUrl, useTranslations, getAlternateUrl } from '@i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const alternateLang = lang === 'pt' ? 'en' : 'pt';
+const alternateUrl = getAlternateUrl(Astro.url, alternateLang);
+const basePath = lang === 'pt' ? '' : '/en';
+
+const navItems = [
+  { href: `${basePath}/#about`, label: t('nav.about') },
+  { href: `${basePath}/#stack`, label: t('nav.stack') },
+  { href: `${basePath}/#experience`, label: t('nav.experience') },
+  { href: `${basePath}/#projects`, label: t('nav.projects') },
+  { href: `${basePath}/#contact`, label: t('nav.contact') },
+];
+---
+
+<header
+  id="site-header"
+  class="sticky top-0 z-50 backdrop-blur-md"
+  style="background: color-mix(in srgb, var(--bg-primary) 85%, transparent); border-bottom: 0.5px solid var(--border);"
+>
+  <div class="container-site">
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo -->
+      <a href={basePath || '/'} class="flex items-center gap-2.5 group">
+        <div
+          class="w-7 h-7 rounded-md flex items-center justify-center font-mono text-[11px] font-medium transition-transform group-hover:scale-110"
+          style="background: var(--accent); color: white;"
+        >
+          &lt;/&gt;
+        </div>
+        <span class="font-medium text-sm">neresdu.dev</span>
+      </a>
+
+      <!-- Desktop nav (hidden below md) -->
+      <nav class="hidden md:flex items-center gap-6">
+        {navItems.map((item) => (
+          <a
+            href={item.href}
+            class="text-sm transition-colors hover:text-[color:var(--accent-light)]"
+            style="color: var(--text-secondary);"
+          >
+            {item.label}
+          </a>
+        ))}
+
+        <a
+          href={alternateUrl}
+          class="px-2 py-1 rounded text-[11px] font-mono transition-colors"
+          style="border: 0.5px solid var(--border-strong); color: var(--text-secondary);"
+          aria-label={`Switch to ${alternateLang}`}
+        >
+          {lang === 'pt' ? 'EN' : 'PT'}
+        </a>
+
+        <button
+          id="theme-toggle"
+          type="button"
+          class="px-2 py-1.5 rounded transition-colors"
+          style="border: 0.5px solid var(--border-strong);"
+          aria-label={t('theme.toggle')}
+        >
+          <svg class="sun-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <svg class="moon-icon w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+      </nav>
+
+      <!-- Mobile controls (hidden above md) -->
+      <div class="flex md:hidden items-center gap-2">
+        <button
+          id="theme-toggle-mobile"
+          type="button"
+          class="px-2 py-1.5 rounded"
+          style="border: 0.5px solid var(--border-strong);"
+          aria-label={t('theme.toggle')}
+        >
+          <svg class="sun-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <svg class="moon-icon w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+
+        <button
+          id="menu-toggle"
+          type="button"
+          class="p-2 relative w-9 h-9 flex items-center justify-center"
+          aria-label="Open menu"
+          aria-expanded="false"
+        >
+          <!-- Hamburger icon (shown when menu closed) -->
+          <span class="hamburger-icon flex flex-col gap-1.5">
+            <span class="block w-5 h-[1.5px] bg-current"></span>
+            <span class="block w-5 h-[1.5px] bg-current"></span>
+            <span class="block w-5 h-[1.5px] bg-current"></span>
+          </span>
+          <!-- Close icon (shown when menu open) -->
+          <svg class="close-icon hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile menu drawer — outside header so it can cover the full viewport below the header -->
+<div
+  id="mobile-menu"
+  class="fixed inset-x-0 bottom-0 z-40 md:hidden opacity-0 pointer-events-none transition-opacity duration-200"
+  style="top: 64px; background: var(--bg-primary);"
+  aria-hidden="true"
+>
+  <nav class="container-site py-6 h-full overflow-y-auto">
+    <ul class="space-y-0">
+      {navItems.map((item, idx) => (
+        <li
+          class="flex items-center justify-between py-4"
+          style="border-bottom: 0.5px solid var(--border);"
+        >
+          <a href={item.href} class="text-lg font-medium mobile-nav-link">
+            {item.label}
+          </a>
+          <span class="font-mono text-xs" style="color: var(--text-tertiary);">
+            {String(idx + 1).padStart(2, '0')}
+          </span>
+        </li>
+      ))}
+    </ul>
+
+    <div class="flex gap-2 mt-8">
+      <a
+        href={alternateUrl}
+        class="flex-1 py-3 rounded-md text-center font-mono text-xs"
+        style="border: 0.5px solid var(--border-strong); color: var(--text-secondary);"
+      >
+        {lang === 'pt' ? 'Switch to EN' : 'Mudar para PT'}
+      </a>
+    </div>
+  </nav>
+</div>
+
+<script>
+  // ==========================================
+  // Theme toggle (light/dark)
+  // ==========================================
+  const getTheme = (): 'light' | 'dark' => {
+    const stored = localStorage.getItem('theme');
+    if (stored === 'light' || stored === 'dark') return stored;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  };
+
+  const setTheme = (theme: 'light' | 'dark') => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    localStorage.setItem('theme', theme);
+    updateThemeIcons(theme);
+  };
+
+  const updateThemeIcons = (theme: 'light' | 'dark') => {
+    document.querySelectorAll('.sun-icon').forEach((el) => {
+      el.classList.toggle('hidden', theme === 'dark');
+    });
+    document.querySelectorAll('.moon-icon').forEach((el) => {
+      el.classList.toggle('hidden', theme === 'light');
+    });
+  };
+
+  const initial = getTheme();
+  setTheme(initial);
+
+  ['theme-toggle', 'theme-toggle-mobile'].forEach((id) => {
+    document.getElementById(id)?.addEventListener('click', () => {
+      const current = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    });
+  });
+
+  // ==========================================
+  // Mobile menu toggle — cleaner state management
+  // ==========================================
+  const menuToggle = document.getElementById('menu-toggle');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const hamburgerIcon = menuToggle?.querySelector('.hamburger-icon');
+  const closeIcon = menuToggle?.querySelector('.close-icon');
+
+  const openMenu = () => {
+    if (!mobileMenu || !menuToggle) return;
+    mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
+    mobileMenu.classList.add('opacity-100');
+    mobileMenu.setAttribute('aria-hidden', 'false');
+    menuToggle.setAttribute('aria-expanded', 'true');
+    menuToggle.setAttribute('aria-label', 'Close menu');
+    hamburgerIcon?.classList.add('hidden');
+    closeIcon?.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeMenu = () => {
+    if (!mobileMenu || !menuToggle) return;
+    mobileMenu.classList.add('opacity-0', 'pointer-events-none');
+    mobileMenu.classList.remove('opacity-100');
+    mobileMenu.setAttribute('aria-hidden', 'true');
+    menuToggle.setAttribute('aria-expanded', 'false');
+    menuToggle.setAttribute('aria-label', 'Open menu');
+    hamburgerIcon?.classList.remove('hidden');
+    closeIcon?.classList.add('hidden');
+    document.body.style.overflow = '';
+  };
+
+  menuToggle?.addEventListener('click', () => {
+    const isOpen = menuToggle.getAttribute('aria-expanded') === 'true';
+    isOpen ? closeMenu() : openMenu();
+  });
+
+  // Close when clicking a menu link
+  document.querySelectorAll('.mobile-nav-link').forEach((link) => {
+    link.addEventListener('click', () => closeMenu());
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menuToggle?.getAttribute('aria-expanded') === 'true') {
+      closeMenu();
+    }
+  });
+
+  // Close if window is resized above mobile breakpoint
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 768 && menuToggle?.getAttribute('aria-expanded') === 'true') {
+      closeMenu();
+    }
+  });
+</script>

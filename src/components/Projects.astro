@@ -1,0 +1,197 @@
+---
+import { getLangFromUrl, useTranslations } from '@i18n/utils';
+import { personal } from '@/data/profile';
+import { fetchRepos, languageColors } from '@/data/github';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Fetched at build time — runs once per build
+const repos = await fetchRepos();
+
+// Show at most 6 for the main grid (user can see more on GitHub)
+const visibleRepos = repos.slice(0, 6);
+const hasMore = repos.length > 6;
+
+// Format "X days/months/years ago" — simple helper
+function timeAgo(iso: string, language: 'pt' | 'en'): string {
+  const then = new Date(iso).getTime();
+  const now = Date.now();
+  const seconds = Math.floor((now - then) / 1000);
+
+  const units: [number, { pt: string; en: string }][] = [
+    [60 * 60 * 24 * 365, { pt: 'ano', en: 'year' }],
+    [60 * 60 * 24 * 30, { pt: 'mês', en: 'month' }],
+    [60 * 60 * 24 * 7, { pt: 'semana', en: 'week' }],
+    [60 * 60 * 24, { pt: 'dia', en: 'day' }],
+    [60 * 60, { pt: 'hora', en: 'hour' }],
+  ];
+
+  for (const [unitSeconds, labels] of units) {
+    const value = Math.floor(seconds / unitSeconds);
+    if (value >= 1) {
+      const label = labels[language];
+      const plural = value > 1 ? (language === 'pt' ? 's' : 's') : '';
+      return language === 'pt'
+        ? `há ${value} ${label}${plural}`
+        : `${value} ${label}${plural} ago`;
+    }
+  }
+  return language === 'pt' ? 'agora' : 'just now';
+}
+---
+
+<section id="projects" class="container-site py-16 md:py-24">
+  <div class="flex items-baseline justify-between flex-wrap gap-2 mb-2">
+    <div class="section-label">04 / {lang === 'pt' ? 'PROJETOS' : 'PROJECTS'}</div>
+    <a
+      href={personal.github}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="font-mono text-xs transition-colors hover:text-[color:var(--accent-light)]"
+      style="color: var(--text-tertiary);"
+    >
+      github.com/{personal.handle} ↗
+    </a>
+  </div>
+
+  <h2 class="text-2xl md:text-3xl font-medium mb-3">
+    {lang === 'pt' ? 'Repositórios públicos' : 'Public repositories'}
+  </h2>
+  <p class="text-sm md:text-base mb-10 max-w-2xl" style="color: var(--text-secondary);">
+    {lang === 'pt'
+      ? 'Projetos pessoais e experimentos, automaticamente sincronizados do GitHub a cada build.'
+      : 'Personal projects and experiments, automatically synced from GitHub on each build.'}
+  </p>
+
+  {visibleRepos.length === 0 ? (
+    <!-- Empty state (or API failure) -->
+    <div
+      class="rounded-lg p-8 text-center"
+      style="background: var(--bg-secondary); border: 0.5px dashed var(--border-strong);"
+    >
+      <p class="text-sm mb-4" style="color: var(--text-secondary);">
+        {lang === 'pt'
+          ? 'Nenhum repositório público encontrado. Confira meu GitHub diretamente:'
+          : 'No public repositories found. Check out my GitHub directly:'}
+      </p>
+      <a
+        href={personal.github}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn-secondary inline-flex"
+      >
+        {lang === 'pt' ? 'Abrir GitHub' : 'Open GitHub'} ↗
+      </a>
+    </div>
+  ) : (
+    <>
+      <ul class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {visibleRepos.map((repo) => (
+          <li>
+            <a
+              href={repo.html_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="repo-card block h-full rounded-lg p-5 transition-all"
+              style="background: var(--bg-secondary); border: 0.5px solid var(--border);"
+            >
+              <div class="flex items-start justify-between gap-3 mb-2">
+                <h3 class="font-medium text-base flex items-center gap-2 min-w-0">
+                  <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 16 16" fill="currentColor" style="color: var(--text-tertiary);">
+                    <path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z" />
+                  </svg>
+                  <span class="truncate" style="color: var(--accent-light);">{repo.name}</span>
+                </h3>
+                <div class="flex items-center gap-3 text-xs font-mono shrink-0" style="color: var(--text-tertiary);">
+                  {repo.stargazers_count > 0 && (
+                    <span class="flex items-center gap-1" title={`${repo.stargazers_count} stars`}>
+                      <svg class="w-3 h-3" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z" />
+                      </svg>
+                      {repo.stargazers_count}
+                    </span>
+                  )}
+                  {repo.forks_count > 0 && (
+                    <span class="flex items-center gap-1" title={`${repo.forks_count} forks`}>
+                      <svg class="w-3 h-3" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M5 5.372v.878c0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75v-.878a2.25 2.25 0 1 1 1.5 0v.878a2.25 2.25 0 0 1-2.25 2.25h-1.5v2.128a2.251 2.251 0 1 1-1.5 0V8.5h-1.5A2.25 2.25 0 0 1 3.5 6.25v-.878a2.25 2.25 0 1 1 1.5 0ZM5 3.25a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Zm6.75.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm-3 8.75a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0Z" />
+                      </svg>
+                      {repo.forks_count}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {repo.description && (
+                <p class="text-sm leading-relaxed mb-4 line-clamp-2" style="color: var(--text-secondary);">
+                  {repo.description}
+                </p>
+              )}
+
+              {/* Topics (repo tags) */}
+              {repo.topics.length > 0 && (
+                <div class="flex flex-wrap gap-1.5 mb-4">
+                  {repo.topics.slice(0, 4).map((topic) => (
+                    <span
+                      class="font-mono text-[10px] px-1.5 py-0.5 rounded"
+                      style="background: var(--bg-tertiary); color: var(--text-secondary);"
+                    >
+                      {topic}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Language + updated */}
+              <div class="flex items-center justify-between text-xs font-mono" style="color: var(--text-tertiary);">
+                <div class="flex items-center gap-4">
+                  {repo.language && (
+                    <span class="flex items-center gap-1.5">
+                      <span
+                        class="w-2.5 h-2.5 rounded-full inline-block"
+                        style={`background: ${languageColors[repo.language] || '#888'};`}
+                      ></span>
+                      {repo.language}
+                    </span>
+                  )}
+                </div>
+                <span>{timeAgo(repo.updated_at, lang)}</span>
+              </div>
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      {hasMore && (
+        <div class="mt-6 text-center">
+          <a
+            href={personal.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-secondary inline-flex"
+          >
+            {lang === 'pt'
+              ? `Ver mais ${repos.length - 6} repositórios no GitHub`
+              : `See ${repos.length - 6} more repositories on GitHub`}
+            <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      )}
+    </>
+  )}
+</section>
+
+<style>
+  .repo-card:hover {
+    border-color: var(--accent-light) !important;
+    transform: translateY(-2px);
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

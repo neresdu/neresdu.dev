@@ -1,0 +1,149 @@
+---
+import { getLangFromUrl, useTranslations } from '@i18n/utils';
+import { experiences, certifications, formatPeriod } from '@/data/profile';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section id="experience" class="container-site py-16 md:py-24">
+  <div class="section-label mb-2">03 / {t('experience.section')}</div>
+  <h2 class="text-2xl md:text-3xl font-medium mb-10">{t('experience.title')}</h2>
+
+  <!-- Timeline -->
+  <div class="relative">
+    <!-- Vertical line — positioned to run through the dots -->
+    <div
+      class="absolute top-2 bottom-2 w-px"
+      style="background: var(--border); left: 7px;"
+      aria-hidden="true"
+    ></div>
+
+    <ol class="space-y-10 md:space-y-12">
+      {experiences.map((exp) => (
+        <li class="relative pl-8 md:pl-10">
+          <!-- Dot -->
+          <span
+            class="absolute top-1.5 w-4 h-4 rounded-full"
+            style={`left: 0; background: var(--bg-primary); border: 2px solid ${exp.current ? 'var(--accent-light)' : 'var(--border-strong)'};`}
+            aria-hidden="true"
+          >
+            {exp.current && (
+              <span
+                class="absolute inset-1 rounded-full"
+                style="background: var(--accent-light);"
+              ></span>
+            )}
+          </span>
+
+          <!-- Header: role + dates -->
+          <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-1">
+            <h3 class="text-lg font-medium">
+              {exp.role[lang]}
+            </h3>
+            {exp.current && (
+              <span
+                class="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full"
+                style="background: var(--accent); color: white;"
+              >
+                {t('experience.current')}
+              </span>
+            )}
+          </div>
+
+          <!-- Company + period + location -->
+          <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm mb-4" style="color: var(--text-secondary);">
+            {exp.companyUrl ? (
+              <a
+                href={exp.companyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hover:text-[color:var(--accent-light)] transition-colors"
+              >
+                {exp.company} ↗
+              </a>
+            ) : (
+              <span>{exp.company}</span>
+            )}
+            <span style="color: var(--text-tertiary);">·</span>
+            <span class="font-mono text-xs">{formatPeriod(exp.period, lang)}</span>
+            <span style="color: var(--text-tertiary);">·</span>
+            <span class="text-xs">{exp.location[lang]}</span>
+          </div>
+
+          <!-- Description bullets -->
+          <ul class="space-y-2 mb-4">
+            {exp.description[lang].map((line) => (
+              <li class="text-sm leading-relaxed flex gap-2" style="color: var(--text-secondary);">
+                <span style="color: var(--accent-light);" aria-hidden="true">→</span>
+                <span>{line}</span>
+              </li>
+            ))}
+          </ul>
+
+          <!-- Tech badges -->
+          {exp.tech && exp.tech.length > 0 && (
+            <ul class="flex flex-wrap gap-1.5">
+              {exp.tech.map((t) => (
+                <li
+                  class="font-mono text-[10px] px-2 py-1 rounded"
+                  style="background: var(--bg-secondary); color: var(--text-secondary); border: 0.5px solid var(--border);"
+                >
+                  {t}
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      ))}
+    </ol>
+  </div>
+
+  <!-- Certifications subsection -->
+  <div class="mt-16 md:mt-20">
+    <h3 class="text-lg font-medium mb-6 flex items-center gap-3">
+      <span class="font-mono text-xs" style="color: var(--text-tertiary);">03.1</span>
+      {t('experience.certifications_title')}
+    </h3>
+
+    <ul class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      {certifications.map((cert) => (
+        <li
+          class={`rounded-lg p-4 transition-colors ${cert.featured ? 'featured-cert' : ''}`}
+          style={`background: var(--bg-secondary); border: 0.5px solid ${cert.featured ? 'var(--accent-light)' : 'var(--border)'};`}
+        >
+          <div class="flex items-start justify-between gap-3 mb-1">
+            <span class="text-sm font-medium leading-snug">{cert.name}</span>
+            {cert.featured && (
+              <span
+                class="font-mono text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded shrink-0"
+                style="background: var(--accent-light); color: var(--bg-primary);"
+              >
+                new
+              </span>
+            )}
+          </div>
+          <div class="flex items-center justify-between text-xs" style="color: var(--text-secondary);">
+            <span>{cert.issuer} · {cert.year}</span>
+            {cert.url && (
+              <a
+                href={cert.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="font-mono text-[10px] hover:text-[color:var(--accent-light)] transition-colors"
+              >
+                {t('experience.verify')} ↗
+              </a>
+            )}
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .featured-cert {
+    position: relative;
+  }
+</style>

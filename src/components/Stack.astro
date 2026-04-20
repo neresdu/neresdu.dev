@@ -1,0 +1,75 @@
+---
+import { getLangFromUrl, useTranslations } from '@i18n/utils';
+import { stack } from '@/data/profile';
+import TechIcon from './TechIcon.astro';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<section id="stack" class="container-site py-16 md:py-24">
+  <div class="section-label mb-2">02 / {t('stack.section')}</div>
+  <h2 class="text-2xl md:text-3xl font-medium mb-3">{t('stack.title')}</h2>
+  <p class="text-sm md:text-base mb-10 max-w-2xl" style="color: var(--text-secondary);">
+    {t('stack.subtitle')}
+  </p>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+    {stack.map((category) => {
+      const hasDaily = category.daily.length > 0;
+      const hasWorked = category.workedWith.length > 0;
+      if (!hasDaily && !hasWorked) return null;
+
+      return (
+        <div
+          class="rounded-lg p-5 md:p-6"
+          style="background: var(--bg-secondary); border: 0.5px solid var(--border);"
+        >
+          <h3 class="font-mono text-[11px] uppercase tracking-wider mb-4" style="color: var(--accent-light);">
+            {category.label[lang]}
+          </h3>
+
+          {hasDaily && (
+            <div class="mb-4">
+              <div class="text-xs mb-3 flex items-center gap-2" style="color: var(--text-secondary);">
+                <span class="w-1.5 h-1.5 rounded-full" style="background: #639922;"></span>
+                {t('stack.daily')}
+              </div>
+              <ul class="flex flex-wrap gap-2">
+                {category.daily.map((tech) => (
+                  <li
+                    class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs"
+                    style="background: var(--bg-primary); border: 0.5px solid var(--border);"
+                  >
+                    <TechIcon name={tech.name} slug={tech.slug} customIcon={tech.customIcon} size={14} />
+                    <span style="color: var(--text-primary);">{tech.name}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {hasWorked && (
+            <div>
+              <div class="text-xs mb-3 flex items-center gap-2" style="color: var(--text-tertiary);">
+                <span class="w-1.5 h-1.5 rounded-full" style="background: var(--text-tertiary);"></span>
+                {t('stack.worked_with')}
+              </div>
+              <ul class="flex flex-wrap gap-2">
+                {category.workedWith.map((tech) => (
+                  <li
+                    class="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs"
+                    style="background: transparent; border: 0.5px solid var(--border);"
+                  >
+                    <TechIcon name={tech.name} slug={tech.slug} customIcon={tech.customIcon} size={14} />
+                    <span style="color: var(--text-secondary);">{tech.name}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      );
+    })}
+  </div>
+</section>
