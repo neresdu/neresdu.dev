@@ -1,0 +1,91 @@
+---
+import { getLangFromUrl, useTranslations } from '@i18n/utils';
+import { nowCards, nowLastUpdated } from '@/data/profile';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+
+// Format the last-updated timestamp like "abr/2026" (pt) or "Apr 2026" (en)
+function formatUpdated(ym: string, language: 'pt' | 'en'): string {
+  const monthsPt = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+  const monthsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const [y, m] = ym.split('-');
+  const months = language === 'pt' ? monthsPt : monthsEn;
+  return language === 'pt'
+    ? `${months[parseInt(m, 10) - 1]}/${y}`
+    : `${months[parseInt(m, 10) - 1]} ${y}`;
+}
+
+const updatedLabel = formatUpdated(nowLastUpdated, lang);
+
+/**
+ * Convert **bold** markdown markers into <strong> tags.
+ * Keeps it simple — just double-asterisks, no other markdown.
+ */
+function renderBold(text: string): string {
+  return text.replace(/\*\*(.+?)\*\*/g, '<strong style="font-weight: 500; color: var(--text-primary);">$1</strong>');
+}
+---
+
+<section id="now" class="container-site py-16 md:py-24 reveal">
+  <!-- Section label + live indicator + updated date -->
+  <div class="flex items-baseline justify-between flex-wrap gap-2 mb-2">
+    <div class="flex items-center gap-3">
+      <span class="section-label">05 / {t('now.section')}</span>
+      <span class="flex items-center gap-1.5 font-mono text-[10px]" style="color: #639922;">
+        <span class="relative flex h-1.5 w-1.5">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style="background: #639922;"></span>
+          <span class="relative inline-flex rounded-full h-1.5 w-1.5" style="background: #639922;"></span>
+        </span>
+        {t('now.live')}
+      </span>
+    </div>
+    <span class="font-mono text-xs" style="color: var(--text-tertiary);">
+      {t('now.updated_prefix')} {updatedLabel}
+    </span>
+  </div>
+
+  <h2 class="text-2xl md:text-3xl font-medium mb-3">{t('now.title')}</h2>
+  <p class="text-sm md:text-base mb-10 max-w-2xl" style="color: var(--text-secondary);">
+    {t('now.subtitle')}
+  </p>
+
+  <!-- Cards grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {nowCards.map((card) => (
+      <div
+        class="rounded-lg p-5 md:p-6 hover-lift"
+        style="background: var(--bg-secondary); border: 0.5px solid var(--border);"
+      >
+        <div class="flex items-center gap-2.5 mb-3">
+          <span
+            class="flex items-center justify-center w-7 h-7 rounded font-mono text-xs font-medium"
+            style="background: var(--bg-tertiary); color: var(--accent);"
+          >
+            {card.letter}
+          </span>
+          <span class="font-mono text-[10px] uppercase tracking-wider" style="color: var(--accent-light);">
+            {card.category[lang]}
+          </span>
+        </div>
+        <p
+          class="text-sm leading-relaxed"
+          style="color: var(--text-secondary);"
+          set:html={renderBold(card.body[lang])}
+        />
+        {card.subtitle && (
+          <p class="text-xs mt-1 font-mono" style="color: var(--text-tertiary);">
+            {card.subtitle[lang]}
+          </p>
+        )}
+      </div>
+    ))}
+  </div>
+
+  <!-- Footer note -->
+  <div class="mt-6 pt-4 flex justify-end" style="border-top: 0.5px solid var(--border);">
+    <span class="font-mono text-[11px]" style="color: var(--text-tertiary);">
+      {t('now.footer_note')}
+    </span>
+  </div>
+</section>

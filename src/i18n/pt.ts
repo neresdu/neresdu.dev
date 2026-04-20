@@ -4,7 +4,7 @@ export const pt = {
     stack: 'Stack',
     experience: 'Experiência',
     projects: 'Projetos',
-    playground: 'Playground',
+    now: 'Now',
     contact: 'Contato',
   },
   hero: {
@@ -35,6 +35,14 @@ export const pt = {
     current: 'Atual',
     certifications_title: 'Certificações',
     verify: 'Verificar',
+  },
+  now: {
+    section: 'NOW',
+    title: 'No que estou focado agora',
+    subtitle: 'O que está ocupando meu tempo e atenção técnica nas últimas semanas.',
+    live: 'LIVE',
+    updated_prefix: 'atualizado em',
+    footer_note: 'atualizado a cada 2-4 semanas',
   },
   footer: {
     built_with: 'Construído com Astro',

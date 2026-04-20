@@ -237,6 +237,60 @@ export const certifications: Certification[] = [
   },
 ];
 
+// -------------------- NOW (current focus) --------------------
+// Update this every 2-4 weeks. Timestamp helps visitors see it's fresh.
+
+export type NowCard = {
+  id: string;
+  letter: string; // single letter shown as monogram (W, C, A, S, etc.)
+  category: { pt: string; en: string };
+  body: { pt: string; en: string };
+  /** Optional subtitle (e.g. book author, course provider) */
+  subtitle?: { pt: string; en: string };
+};
+
+/** ISO date string (YYYY-MM) of the last update — shown in the header. */
+export const nowLastUpdated = '2026-04';
+
+export const nowCards: NowCard[] = [
+  {
+    id: 'work',
+    letter: 'W',
+    category: { pt: 'TRABALHO', en: 'WORK' },
+    body: {
+      pt: 'Onboarding na equipe **IPE da Guidewire** — aprendendo a plataforma de seguros P&C e contribuindo em dashboards analíticos.',
+      en: 'Onboarding at **Guidewire IPE team** — learning the P&C insurance platform and contributing to analytical dashboards.',
+    },
+  },
+  {
+    id: 'cloud',
+    letter: 'C',
+    category: { pt: 'CLOUD', en: 'CLOUD' },
+    body: {
+      pt: 'Estudando para a **AWS Solutions Architect Associate**. Próximo passo depois do Cloud Practitioner.',
+      en: 'Studying for the **AWS Solutions Architect Associate**. Next step after Cloud Practitioner.',
+    },
+  },
+  {
+    id: 'ai',
+    letter: 'A',
+    category: { pt: 'IA', en: 'AI' },
+    body: {
+      pt: 'Cursos da **Anthropic** sobre Claude — aprendendo a usar LLMs de forma estratégica no trabalho diário.',
+      en: '**Anthropic** courses on Claude — learning to use LLMs strategically in my daily work.',
+    },
+  },
+  {
+    id: 'side-project',
+    letter: 'S',
+    category: { pt: 'SIDE PROJECT', en: 'SIDE PROJECT' },
+    body: {
+      pt: 'Explorando opções para um projeto paralelo — pensando entre **Rust**, **Go** e uma integração com LLMs para algo prático.',
+      en: 'Exploring options for a side project — considering **Rust**, **Go** or an LLM integration for something practical.',
+    },
+  },
+];
+
 // -------------------- PERSONAL INFO --------------------
 
 export const personal = {

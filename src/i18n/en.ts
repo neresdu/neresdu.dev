@@ -4,7 +4,7 @@ export const en = {
     stack: 'Stack',
     experience: 'Experience',
     projects: 'Projects',
-    playground: 'Playground',
+    now: 'Now',
     contact: 'Contact',
   },
   hero: {
@@ -35,6 +35,14 @@ export const en = {
     current: 'Current',
     certifications_title: 'Certifications',
     verify: 'Verify',
+  },
+  now: {
+    section: 'NOW',
+    title: 'What I\'m focused on right now',
+    subtitle: 'What has been occupying my time and technical attention in the past few weeks.',
+    live: 'LIVE',
+    updated_prefix: 'updated in',
+    footer_note: 'updated every 2-4 weeks',
   },
   footer: {
     built_with: 'Built with Astro',
