@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 
 export default defineConfig({
-  site: 'https://neresdu.pages.dev',
+  site: 'https://neresdu-dev.pages.dev',
   integrations: [tailwind()],
   i18n: {
     defaultLocale: 'pt',

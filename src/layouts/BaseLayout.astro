@@ -3,18 +3,26 @@ import '@/styles/global.css';
 import Header from '@components/Header.astro';
 import Footer from '@components/Footer.astro';
 import { getLangFromUrl } from '@i18n/utils';
+import { personal } from '@/data/profile';
 
 interface Props {
   title?: string;
   description?: string;
+  /** Path to a custom OG image for this page (defaults to /og-image.png) */
+  ogImage?: string;
 }
 
 const {
-  title = 'Eduardo Neres — Full-stack Developer',
-  description = 'Portfolio of Eduardo Neres — full-stack developer based in São Paulo. Building web, mobile and system applications.',
+  title = 'Eduardo Neres — Software Engineer',
+  description = 'Portfolio of Eduardo Neres — software engineer based in Curitiba, BR. Building reliable backend systems across complex domains. Currently at Guidewire.',
+  ogImage = '/og-image.png',
 } = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
+
+// Canonical URL for the current page (important for SEO)
+const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).toString();
+const ogImageURL = new URL(ogImage, Astro.site ?? Astro.url.origin).toString();
 ---
 
 <!DOCTYPE html>
@@ -22,9 +30,47 @@ const lang = getLangFromUrl(Astro.url);
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
+
+    <!-- Primary meta tags -->
     <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+    <meta name="author" content={personal.name} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Favicon (SVG for sharp rendering at any size) -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <!-- Theme color for mobile browser chrome -->
+    <meta name="theme-color" content="#042C53" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0A0A0B" media="(prefers-color-scheme: dark)" />
+
+    <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${personal.name} — ${title}`} />
+    <meta property="og:site_name" content="neresdu.dev" />
+    <meta property="og:locale" content={lang === 'pt' ? 'pt_BR' : 'en_US'} />
+    <meta property="og:locale:alternate" content={lang === 'pt' ? 'en_US' : 'pt_BR'} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalURL} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
+
+    <!-- Alternate language (hreflang) for SEO -->
+    <link rel="alternate" hreflang="pt-BR" href={new URL('/', Astro.site ?? Astro.url.origin).toString()} />
+    <link rel="alternate" hreflang="en" href={new URL('/en', Astro.site ?? Astro.url.origin).toString()} />
+    <link rel="alternate" hreflang="x-default" href={new URL('/', Astro.site ?? Astro.url.origin).toString()} />
 
     <!-- Prevent flash of wrong theme -->
     <script is:inline>
