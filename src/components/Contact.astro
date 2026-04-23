@@ -69,7 +69,6 @@ const l = labels[lang];
     <form id="contact-form" class="space-y-4">
       <!-- Web3Forms hidden fields -->
       <input type="hidden" name="access_key" value={WEB3FORMS_KEY} />
-      <input type="hidden" name="subject" value={`[neresdu.dev] New contact from the site`} />
       <input type="hidden" name="from_name" value="neresdu.dev contact form" />
       <input type="checkbox" name="botcheck" class="hidden" style="display:none" tabindex="-1" autocomplete="off" />
 
@@ -106,7 +105,7 @@ const l = labels[lang];
         </label>
         <input
           type="text"
-          name="user_subject"
+          name="subject"
           required
           placeholder={l.subject_placeholder}
           class="form-input w-full"
@@ -221,6 +220,11 @@ const l = labels[lang];
     formData.forEach((value, key) => {
       object[key] = value;
     });
+
+    // Prefix the user-provided subject with site branding
+    if (typeof object.subject === 'string') {
+      object.subject = `[neresdu.dev] ${object.subject}`;
+    }
 
     try {
       const res = await fetch('https://api.web3forms.com/submit', {
