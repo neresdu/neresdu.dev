@@ -192,7 +192,7 @@ export type Certification = {
   name: string;
   issuer: string;
   year: string;
-  url?: string; // verification URL if available
+  url?: string; // direct verification URL if available
   featured?: boolean; // highlight at the top
 };
 
@@ -202,7 +202,7 @@ export const certifications: Certification[] = [
     name: 'AWS Certified Cloud Practitioner',
     issuer: 'Amazon Web Services',
     year: '2026',
-    url: 'https://aws.amazon.com/verification',
+    url: 'https://cp.certmetrics.com/amazon/en/public/verify/credential/e42951113fe34605aaa21d771cd634a1',
     featured: true,
   },
   {
@@ -300,7 +300,7 @@ export const personal = {
   timezone: 'UTC-3',
   email: 'eduardoneress12@gmail.com',
   github: 'https://github.com/neresdu',
-  linkedin: 'https://linkedin.com/in/eduardoneres-029955123',
+  linkedin: 'https://www.linkedin.com/in/eduardo-neres-029955123/',
   yearsOfExperience: 4,
 };
 
