@@ -1,0 +1,339 @@
+---
+/**
+ * HeroBackground — subtle animated background for the hero section.
+ *
+ * Three layers (all decorative, pointer-events: none):
+ *   1. Dotted grid — ambient SVG-ish pattern with edge-fade mask
+ *   2. Spotlight    — soft accent-colored glow that follows the mouse with lerp
+ *   3. Aurora glow  — diffuse radial gradient at the bottom for depth
+ *
+ * Respects prefers-reduced-motion: spotlight is disabled, glow/dots stay static.
+ */
+---
+
+<div class="hero-bg" aria-hidden="true">
+  <!-- Dotted grid -->
+  <div class="hero-bg-dots"></div>
+
+  <!-- Floating blobs — always visible, more pronounced on touch devices -->
+  <div class="hero-bg-blob hero-bg-blob-1"></div>
+  <div class="hero-bg-blob hero-bg-blob-2"></div>
+  <div class="hero-bg-blob hero-bg-blob-3"></div>
+
+  <!-- Mouse-following spotlight (desktop only) -->
+  <div class="hero-bg-spotlight"></div>
+
+  <!-- Ambient glow at the bottom -->
+  <div class="hero-bg-glow"></div>
+
+  <!-- Gradient fade at the bottom edge to blend into the status bar -->
+  <div class="hero-bg-fade"></div>
+</div>
+
+<style>
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0;
+    animation: hero-bg-enter 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+  }
+
+  @keyframes hero-bg-enter {
+    to { opacity: 1; }
+  }
+
+  /* ================================================================
+     Layer 1 — Dotted grid
+     ================================================================ */
+  .hero-bg-dots {
+    position: absolute;
+    inset: -8%;
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      currentColor 1px,
+      transparent 0
+    );
+    background-size: 22px 22px;
+    color: var(--text-primary);
+    opacity: 0.11;
+    /* Fade edges so the grid doesn't have a harsh cutoff */
+    mask-image: radial-gradient(
+      ellipse 75% 65% at 50% 35%,
+      black 10%,
+      transparent 75%
+    );
+    -webkit-mask-image: radial-gradient(
+      ellipse 75% 65% at 50% 35%,
+      black 10%,
+      transparent 75%
+    );
+    transition: opacity 0.3s ease;
+  }
+
+  :global(html.dark) .hero-bg-dots {
+    opacity: 0.2;
+  }
+
+  /* ================================================================
+     Layer 2 — Spotlight
+     ================================================================ */
+  .hero-bg-spotlight {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    left: var(--spot-x, 50%);
+    top: var(--spot-y, 40%);
+    transform: translate(-50%, -50%);
+    background: radial-gradient(
+      circle at center,
+      color-mix(in srgb, var(--accent-light) 28%, transparent) 0%,
+      color-mix(in srgb, var(--accent-light) 10%, transparent) 30%,
+      transparent 70%
+    );
+    filter: blur(6px);
+    opacity: 0;
+    transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: left, top, opacity;
+  }
+
+  .hero-bg.is-active .hero-bg-spotlight {
+    opacity: 0.7;
+  }
+
+  :global(html.dark) .hero-bg.is-active .hero-bg-spotlight {
+    opacity: 0.95;
+  }
+
+  /* ================================================================
+     Layer 2.5 — Floating blobs (work on any device, shine on mobile)
+     ================================================================ */
+  .hero-bg-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.35;
+    will-change: transform;
+    mix-blend-mode: normal;
+  }
+
+  .hero-bg-blob-1 {
+    width: 340px;
+    height: 340px;
+    top: 10%;
+    left: -8%;
+    background: radial-gradient(
+      circle at center,
+      color-mix(in srgb, var(--accent-light) 70%, transparent) 0%,
+      color-mix(in srgb, var(--accent) 20%, transparent) 50%,
+      transparent 100%
+    );
+    animation: blob-float-1 12s ease-in-out infinite;
+  }
+
+  .hero-bg-blob-2 {
+    width: 280px;
+    height: 280px;
+    top: 45%;
+    right: -5%;
+    background: radial-gradient(
+      circle at center,
+      color-mix(in srgb, var(--accent) 60%, transparent) 0%,
+      color-mix(in srgb, var(--accent-light) 25%, transparent) 50%,
+      transparent 100%
+    );
+    animation: blob-float-2 14s ease-in-out infinite;
+    animation-delay: -4s;
+  }
+
+  .hero-bg-blob-3 {
+    width: 220px;
+    height: 220px;
+    bottom: 0%;
+    left: 40%;
+    background: radial-gradient(
+      circle at center,
+      color-mix(in srgb, var(--accent-light) 55%, transparent) 0%,
+      transparent 100%
+    );
+    animation: blob-float-3 16s ease-in-out infinite;
+    animation-delay: -6s;
+  }
+
+  /* Light mode: softer, less saturated */
+  :global(html:not(.dark)) .hero-bg-blob {
+    opacity: 0.25;
+    filter: blur(70px);
+  }
+
+  /* Dark mode: richer presence */
+  :global(html.dark) .hero-bg-blob {
+    opacity: 0.45;
+  }
+
+  /* Touch devices (no hover) — boost blob visibility to compensate for
+     missing spotlight. This is the main eye candy on mobile. */
+  @media (hover: none) {
+    .hero-bg-blob {
+      opacity: 0.55;
+      filter: blur(50px);
+    }
+    :global(html:not(.dark)) .hero-bg-blob {
+      opacity: 0.4;
+      filter: blur(60px);
+    }
+    /* Spotlight never fires on touch — free up its visual space */
+    .hero-bg-spotlight {
+      display: none;
+    }
+  }
+
+  /* Each blob drifts along a different organic path — amplified so motion
+     is clearly visible even on smaller screens. */
+  @keyframes blob-float-1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25%      { transform: translate(180px, 80px) scale(1.2); }
+    50%      { transform: translate(250px, -60px) scale(0.9); }
+    75%      { transform: translate(80px, 140px) scale(1.1); }
+  }
+
+  @keyframes blob-float-2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%      { transform: translate(-200px, 100px) scale(1.15); }
+    66%      { transform: translate(-120px, -120px) scale(0.85); }
+  }
+
+  @keyframes blob-float-3 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%      { transform: translate(120px, -180px) scale(1.25); }
+    66%      { transform: translate(-100px, -80px) scale(0.9); }
+  }
+
+  /* ================================================================
+     Layer 3 — Aurora glow at the bottom
+     ================================================================ */
+  .hero-bg-glow {
+    position: absolute;
+    bottom: -45%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 80%;
+    background: radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--accent-light) 10%, transparent) 0%,
+      color-mix(in srgb, var(--accent) 6%, transparent) 40%,
+      transparent 65%
+    );
+    filter: blur(80px);
+    opacity: 0.8;
+    animation: hero-bg-breathe 8s ease-in-out infinite;
+  }
+
+  :global(html.dark) .hero-bg-glow {
+    background: radial-gradient(
+      ellipse at center,
+      color-mix(in srgb, var(--accent-light) 22%, transparent) 0%,
+      color-mix(in srgb, var(--accent) 14%, transparent) 40%,
+      transparent 65%
+    );
+    opacity: 1;
+  }
+
+  @keyframes hero-bg-breathe {
+    0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.8; }
+    50%      { transform: translateX(-50%) scale(1.08); opacity: 1; }
+  }
+
+  :global(html.dark) .hero-bg-glow {
+    animation-name: hero-bg-breathe-dark;
+  }
+
+  @keyframes hero-bg-breathe-dark {
+    0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.85; }
+    50%      { transform: translateX(-50%) scale(1.08); opacity: 1; }
+  }
+
+  /* ================================================================
+     Bottom fade — blends the bg into the status bar below
+     ================================================================ */
+  .hero-bg-fade {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 25%;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      var(--bg-primary) 90%
+    );
+  }
+
+  /* ================================================================
+     Reduced motion — kill animations, keep static ambient glow
+     ================================================================ */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-bg {
+      opacity: 1;
+      animation: none;
+    }
+    .hero-bg-glow,
+    .hero-bg-blob {
+      animation: none;
+    }
+    .hero-bg-spotlight {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  (() => {
+    const bg = document.querySelector<HTMLElement>('.hero-bg');
+    const spotlight = bg?.querySelector<HTMLElement>('.hero-bg-spotlight');
+    const section = bg?.parentElement;
+    if (!bg || !spotlight || !section) return;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // Lerp state — target (tx, ty) and current (cx, cy) positions in %
+    let tx = 50;
+    let ty = 40;
+    let cx = 50;
+    let cy = 40;
+    let raf = 0;
+    let isHovering = false;
+
+    const tick = () => {
+      // Smoothly approach the target — classic lerp
+      cx += (tx - cx) * 0.11;
+      cy += (ty - cy) * 0.11;
+
+      spotlight.style.left = `${cx}%`;
+      spotlight.style.top = `${cy}%`;
+
+      if (isHovering || Math.abs(tx - cx) > 0.2 || Math.abs(ty - cy) > 0.2) {
+        raf = requestAnimationFrame(tick);
+      } else {
+        raf = 0;
+      }
+    };
+
+    section.addEventListener('mousemove', (e) => {
+      const rect = section.getBoundingClientRect();
+      tx = ((e.clientX - rect.left) / rect.width) * 100;
+      ty = ((e.clientY - rect.top) / rect.height) * 100;
+      isHovering = true;
+      bg.classList.add('is-active');
+      if (!raf) raf = requestAnimationFrame(tick);
+    });
+
+    section.addEventListener('mouseleave', () => {
+      isHovering = false;
+      bg.classList.remove('is-active');
+    });
+  })();
+</script>

@@ -1,50 +1,55 @@
 ---
 import { getLangFromUrl, useTranslations } from '@i18n/utils';
 import { personal } from '@/data/profile';
+import HeroBackground from './HeroBackground.astro';
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const basePath = lang === 'pt' ? '' : '/en';
 ---
 
-<section class="container-site pt-20 md:pt-28 pb-12">
-  <div class="max-w-3xl hero-stagger">
-    <!-- Tagline -->
-    <div
-      class="font-mono text-xs md:text-sm tracking-wider mb-4"
-      style="color: var(--accent-light);"
-    >
-      {t('hero.tagline')}
-    </div>
+<section class="hero-section relative overflow-hidden">
+  <HeroBackground />
 
-    <!-- Headline -->
-    <h1 class="text-display font-medium mb-5" style="color: var(--text-primary);">
-      {t('hero.title')}
-    </h1>
-
-    <!-- Description -->
-    <p
-      class="text-base md:text-lg leading-relaxed mb-8 max-w-2xl"
-      style="color: var(--text-secondary);"
-    >
-      {t('hero.description')}
-    </p>
-
-    <!-- CTAs -->
-    <div class="flex flex-col sm:flex-row gap-3">
-      <a href={`${basePath}/#experience`} class="btn-primary">
-        {lang === 'pt' ? 'Ver trajetória' : 'View journey'}
-        <span aria-hidden="true">→</span>
-      </a>
-      <a
-        href={personal.github}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="btn-secondary"
+  <div class="container-site relative pt-20 md:pt-28 pb-12" style="z-index: 1;">
+    <div class="max-w-3xl hero-stagger">
+      <!-- Tagline -->
+      <div
+        class="font-mono text-xs md:text-sm tracking-wider mb-4"
+        style="color: var(--accent-light);"
       >
-        {t('hero.cta_github')}
-        <span aria-hidden="true">↗</span>
-      </a>
+        {t('hero.tagline')}
+      </div>
+
+      <!-- Headline -->
+      <h1 class="text-display font-medium mb-5" style="color: var(--text-primary);">
+        {t('hero.title')}
+      </h1>
+
+      <!-- Description -->
+      <p
+        class="text-base md:text-lg leading-relaxed mb-8 max-w-2xl"
+        style="color: var(--text-secondary);"
+      >
+        {t('hero.description')}
+      </p>
+
+      <!-- CTAs -->
+      <div class="flex flex-col sm:flex-row gap-3">
+        <a href={`${basePath}/#experience`} class="btn-primary">
+          {lang === 'pt' ? 'Ver trajetória' : 'View journey'}
+          <span aria-hidden="true">→</span>
+        </a>
+        <a
+          href={personal.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="btn-secondary"
+        >
+          {t('hero.cta_github')}
+          <span aria-hidden="true">↗</span>
+        </a>
+      </div>
     </div>
   </div>
 </section>
